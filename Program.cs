@@ -126,16 +126,19 @@ async Task ExtractToCsv(IReadOnlyList<VideoDetail> videoDetails, string path)
         .AppendJoin(',', "title", "id", "thumbnailUrl", "duration")
         .AppendLine();
 
-    foreach (var detail in videoDetails)
+    for (int i = 0; i < videoDetails.Count; i++)
     {
+        var detail = videoDetails[i];
         builder = builder
             .AppendJoin(',',
                 GetCSVString(detail.Title),
                 GetCSVString(detail.Id),
                 GetCSVString(detail.ThumbnailUrl),
-                GetCSVString($"{detail.Duration.Minutes}:{detail.Duration.Seconds}"))
-            .AppendLine();
+                GetCSVString($"{detail.Duration.Minutes}:{detail.Duration.Seconds}"));
+
+        if (i < videoDetails.Count - 1) builder.AppendLine();
     }
+
     await writer.WriteAsync(builder);
 
     static string GetCSVString<T>(T obj) => obj is null ? "\"---\"" : $"\"{obj}\"";
